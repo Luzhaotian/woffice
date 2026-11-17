@@ -31,9 +31,12 @@
     "lint:commit": "commitlint --from HEAD~1 --to HEAD"
   },
   "lint-staged": {
-    "*.{ts,tsx,js,mjs,cjs,json,css,html}": [
+    "*.{ts,tsx,js,mjs,cjs}": [
       "prettier --write",
       "oxlint --fix"
+    ],
+    "*.{json,css,html}": [
+      "prettier --write"
     ]
   },
   "keywords": [
