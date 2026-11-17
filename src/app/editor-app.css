@@ -1,0 +1,602 @@
+/**
+ * WofficeApp 外壳样式
+ *
+ * 作用域统一以 .woffice-app 开头，避免污染使用方页面。
+ * 由 editor-app.ts 引入，使用方无需额外 import CSS。
+ */
+
+.woffice-app {
+  --woffice-primary: #4f7cff;
+  --woffice-primary-weak: #e6edff;
+  --woffice-text: #1a2233;
+  --woffice-text-2: #6b7688;
+  --woffice-text-3: #98a2b3;
+  --woffice-border: #e6eaf2;
+  --woffice-bg: #eef1f6;
+  --woffice-hover: #f3f6fc;
+  --woffice-shadow: 0 1px 2px rgba(16, 24, 40, 0.06), 0 1px 3px rgba(16, 24, 40, 0.1);
+  --woffice-page-shadow: 0 1px 3px rgba(16, 24, 40, 0.1), 0 12px 32px rgba(16, 24, 40, 0.09);
+
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC',
+    'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+  font-size: 14px;
+  color: var(--woffice-text);
+  background: var(--woffice-bg);
+}
+
+.woffice-app * {
+  box-sizing: border-box;
+}
+
+/* ---------------------------------------------------------------- 顶栏 */
+
+.woffice-app-header {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  height: 60px;
+  padding: 0 20px;
+  background: #fff;
+  border-bottom: 1px solid var(--woffice-border);
+  z-index: 20;
+}
+
+.woffice-app-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 230px;
+}
+
+.woffice-app-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  background: linear-gradient(135deg, #4f7cff, #7c5cff);
+  color: #fff;
+  font-size: 17px;
+  font-weight: 700;
+  box-shadow: 0 4px 10px rgba(79, 124, 255, 0.28);
+}
+
+.woffice-app-brand-meta {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.woffice-app-brand-meta h1 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+}
+
+.woffice-app-brand-sub {
+  font-size: 11px;
+  color: var(--woffice-text-3);
+}
+
+.woffice-app-version {
+  margin-left: 2px;
+  padding: 2px 8px;
+  border: 1px solid #d8e0ff;
+  border-radius: 999px;
+  background: #eef2ff;
+  color: var(--woffice-primary);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.woffice-app-title-wrap {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+
+.woffice-app-title {
+  width: min(420px, 100%);
+  padding: 8px 12px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: transparent;
+  font-size: 15px;
+  font-weight: 600;
+  text-align: center;
+  color: var(--woffice-text);
+  transition: border-color 0.15s, background 0.15s, box-shadow 0.15s;
+}
+
+.woffice-app-title:hover {
+  background: var(--woffice-hover);
+}
+
+.woffice-app-title:focus {
+  outline: none;
+  background: #fff;
+  border-color: var(--woffice-primary);
+  box-shadow: 0 0 0 3px rgba(79, 124, 255, 0.15);
+}
+
+.woffice-app-title::placeholder {
+  color: var(--woffice-text-3);
+  font-weight: 400;
+}
+
+.woffice-app-actions {
+  display: flex;
+  gap: 8px;
+  min-width: 230px;
+  justify-content: flex-end;
+}
+
+.woffice-app-btn {
+  padding: 8px 14px;
+  border: 1px solid var(--woffice-border);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--woffice-text);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.woffice-app-btn:hover {
+  background: var(--woffice-hover);
+  border-color: #d5dcea;
+}
+
+.woffice-app-btn-primary {
+  background: var(--woffice-primary);
+  border-color: var(--woffice-primary);
+  color: #fff;
+}
+
+.woffice-app-btn-primary:hover {
+  background: #3d6ae8;
+  border-color: #3d6ae8;
+}
+
+.woffice-app-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  background: #f1f4f9;
+  border-color: var(--woffice-border);
+  color: var(--woffice-text-3);
+}
+
+.woffice-app-btn-primary:disabled:hover {
+  background: #f1f4f9;
+  border-color: var(--woffice-border);
+}
+
+/* ---------------------------------------------------------------- 工具栏 */
+
+.woffice-app-toolbar {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  height: 46px;
+  padding: 0 12px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  background: #fff;
+  border-bottom: 1px solid var(--woffice-border);
+  z-index: 15;
+}
+
+.woffice-app-toolbar::-webkit-scrollbar {
+  display: none;
+}
+
+.woffice-app-tb-group {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex: none;
+}
+
+.woffice-app-tb-sep {
+  flex: none;
+  width: 1px;
+  height: 20px;
+  margin: 0 6px;
+  background: var(--woffice-border);
+}
+
+.woffice-app-tb-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 30px;
+  height: 30px;
+  padding: 0 6px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: #3b4658;
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s;
+}
+
+.woffice-app-tb-btn:hover {
+  background: var(--woffice-hover);
+  color: var(--woffice-text);
+}
+
+.woffice-app-tb-btn.active {
+  background: var(--woffice-primary-weak);
+  color: var(--woffice-primary);
+}
+
+.woffice-app-tb-btn:disabled {
+  opacity: 0.35;
+  cursor: default;
+  background: transparent;
+}
+
+.woffice-app-tb-btn svg {
+  display: block;
+}
+
+.woffice-app-tb-dropdown {
+  position: relative;
+  flex: none;
+}
+
+.woffice-app-tb-trigger {
+  gap: 6px;
+  min-width: 116px;
+  padding: 0 10px;
+  justify-content: space-between;
+  font-size: 13px;
+}
+
+.woffice-app-tb-trigger-label {
+  flex: 1;
+  overflow: hidden;
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.woffice-app-tb-menu {
+  position: fixed;
+  z-index: 1000;
+  min-width: 150px;
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  border: 1px solid var(--woffice-border);
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(16, 24, 40, 0.14);
+}
+
+.woffice-app-tb-menu[hidden] {
+  display: none;
+}
+
+.woffice-app-tb-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 10px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--woffice-text);
+  font-size: 13px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.woffice-app-tb-menu-item:hover {
+  background: var(--woffice-hover);
+}
+
+.woffice-app-tb-menu-item.active {
+  background: var(--woffice-primary-weak);
+  color: var(--woffice-primary);
+  font-weight: 600;
+}
+
+/* ---------------------------------------------------------------- 画布 */
+
+.woffice-app-canvas {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 28px 24px 80px;
+  background: var(--woffice-bg);
+}
+
+/* 流式视图：整篇一张白纸 */
+.woffice-app .woffice-editor-content {
+  max-width: 794px;
+  min-height: 940px;
+  margin: 0 auto;
+  padding: 56px 60px;
+  background: #fff;
+  box-shadow: var(--woffice-page-shadow);
+  outline: none;
+  font-size: 15px;
+  line-height: 1.85;
+  color: var(--woffice-text);
+}
+
+.woffice-app .woffice-editor-content.view-page {
+  max-width: none;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.woffice-app .woffice-page {
+  position: relative;
+  margin: 0 auto 24px;
+  background: #fff;
+  box-shadow: var(--woffice-page-shadow);
+  box-sizing: border-box;
+  /* Word 标准：页面高度固定（A4 @96dpi），不随内容增高 */
+  height: 1123px !important;
+  overflow: hidden;
+}
+
+.woffice-app .woffice-page-number {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 34px;
+  padding: 10px 0 6px;
+  text-align: center;
+  color: var(--woffice-text-3);
+  font-size: 12px;
+  /* 页码不可选中、不可点、不可编辑 */
+  pointer-events: none;
+  user-select: none;
+}
+
+/* ---------------------------------------------------------------- 排版 */
+
+.woffice-app .woffice-editor-content p {
+  margin: 0 0 10px;
+}
+
+.woffice-app .woffice-editor-content h1 {
+  margin: 0 0 14px;
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.woffice-app .woffice-editor-content h2 {
+  margin: 0 0 12px;
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.woffice-app .woffice-editor-content h3 {
+  margin: 0 0 10px;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.45;
+}
+
+.woffice-app .woffice-editor-content blockquote {
+  margin: 0 0 10px;
+  padding-left: 14px;
+  border-left: 3px solid #cbd5e1;
+  color: #556070;
+}
+
+.woffice-app .woffice-editor-content pre {
+  margin: 0 0 10px;
+  padding: 14px 16px;
+  border: 1px solid #eef2f7;
+  border-radius: 8px;
+  background: #f8fafc;
+  font-family: 'SF Mono', Menlo, Consolas, monospace;
+  font-size: 13px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+/* 相邻代码块连成一体：中间不留卡片缝隙（导入 / 历史文档里可能出现相邻 pre） */
+.woffice-app .woffice-editor-content pre + pre {
+  margin-top: -10px;
+  padding-top: 0;
+  border-top: none;
+  border-radius: 0;
+}
+
+.woffice-app .woffice-editor-content pre:has(+ pre) {
+  padding-bottom: 0;
+  border-bottom: none;
+  border-radius: 8px 8px 0 0;
+}
+
+.woffice-app .woffice-editor-content pre + pre:last-child {
+  padding-bottom: 14px;
+  border-radius: 0 0 8px 8px;
+}
+
+.woffice-app .woffice-editor-content ul,
+.woffice-app .woffice-editor-content ol {
+  margin: 0 0 10px;
+  padding-left: 26px;
+}
+
+.woffice-app .woffice-editor-content ul {
+  list-style-type: disc;
+}
+
+.woffice-app .woffice-editor-content ol {
+  list-style-type: decimal;
+}
+
+.woffice-app .woffice-editor-content li {
+  display: list-item;
+  margin: 2px 0;
+}
+
+.woffice-app .woffice-editor-content table {
+  width: auto;
+  margin: 0 0 10px;
+  border-collapse: collapse;
+}
+
+.woffice-app .woffice-editor-content td,
+.woffice-app .woffice-editor-content th {
+  min-width: 48px;
+  padding: 6px 10px;
+  border: 1px solid #cbd5e1;
+  vertical-align: top;
+}
+
+.woffice-app .woffice-editor-content th {
+  background: #f8fafc;
+  font-weight: 600;
+}
+
+.woffice-app .woffice-editor-content td p,
+.woffice-app .woffice-editor-content th p {
+  margin: 0;
+}
+
+.woffice-app .woffice-editor-content hr {
+  margin: 18px 0;
+  border: none;
+  border-top: 1px solid var(--woffice-border);
+}
+
+.woffice-app .woffice-editor-content a {
+  color: var(--woffice-primary);
+  text-decoration: none;
+}
+
+.woffice-app .woffice-editor-content a:hover {
+  text-decoration: underline;
+}
+
+.woffice-app .woffice-editor-content strong {
+  font-weight: 700;
+}
+
+.woffice-app .woffice-editor-content mark {
+  padding: 0 2px;
+  border-radius: 3px;
+  background: #fff3bf;
+}
+
+.woffice-app .woffice-editor-content code {
+  padding: 1px 5px;
+  border-radius: 4px;
+  background: #f1f5f9;
+  font-family: 'SF Mono', Menlo, Consolas, monospace;
+  font-size: 13px;
+}
+
+.woffice-app .woffice-editor-content .woffice-page-break {
+  height: 1px;
+  margin: 18px 0;
+  background: repeating-linear-gradient(90deg, #cbd5e1 0 6px, transparent 6px 12px);
+}
+
+.woffice-app .woffice-editor-content .woffice-field {
+  padding: 0 4px;
+  border-radius: 3px;
+  background: #eef2ff;
+  color: var(--woffice-primary);
+  font-size: 13px;
+}
+
+.woffice-app .woffice-editor-content ::selection {
+  background: #c7d7ff;
+}
+
+/* ---------------------------------------------------------------- 状态栏 */
+
+.woffice-app-statusbar {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  height: 30px;
+  padding: 0 14px;
+  background: #fff;
+  border-top: 1px solid var(--woffice-border);
+  font-size: 12px;
+  color: var(--woffice-text-2);
+  z-index: 15;
+}
+
+.woffice-app-status-item {
+  white-space: nowrap;
+}
+
+.woffice-app-status-spacer {
+  flex: 1;
+}
+
+.woffice-app-view-switch {
+  display: flex;
+  padding: 2px;
+  border-radius: 7px;
+  background: #f1f4f9;
+}
+
+.woffice-app-view-btn {
+  padding: 4px 12px;
+  border: none;
+  border-radius: 5px;
+  background: transparent;
+  color: var(--woffice-text-2);
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.woffice-app-view-btn.active {
+  background: #fff;
+  color: var(--woffice-text);
+  font-weight: 600;
+  box-shadow: var(--woffice-shadow);
+}
+
+/* ---------------------------------------------------------------- 提示 */
+
+.woffice-app-toast {
+  position: fixed;
+  left: 50%;
+  bottom: 48px;
+  z-index: 2000;
+  transform: translateX(-50%) translateY(8px);
+  padding: 8px 16px;
+  border-radius: 8px;
+  background: rgba(26, 34, 51, 0.92);
+  color: #fff;
+  font-size: 13px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.18s, transform 0.18s;
+}
+
+.woffice-app-toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
