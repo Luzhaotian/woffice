@@ -1,0 +1,10 @@
+node_modules
+dist
+dist-ssr
+.pnpm-store
+pnpm-lock.yaml
+test-results
+playwright-report
+.playwright-mcp
+# 文档先不参与自动格式化，避免大面积改动
+*.md

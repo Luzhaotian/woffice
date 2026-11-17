@@ -45,7 +45,9 @@ describe('insertTextAt', () => {
   })
 
   it('显式空 marks：在加粗文本末尾插入无格式文字', () => {
-    const doc = createDocument([createElement('paragraph', [createText('abc', [{ type: 'bold' }])])])
+    const doc = createDocument([
+      createElement('paragraph', [createText('abc', [{ type: 'bold' }])]),
+    ])
     const { steps, caret } = insertTextAt(doc, { path: [0, 0], offset: 3 }, 'd', [])
     expect(applySteps(doc, steps)).toEqual(
       createDocument([
@@ -59,18 +61,18 @@ describe('insertTextAt', () => {
 describe('deleteRange', () => {
   it('同一文本节点内删除', () => {
     const doc = createDocument([createElement('paragraph', [createText('abc')])])
-    expect(applySteps(doc, deleteRange(doc, { path: [0, 0], offset: 1 }, { path: [0, 0], offset: 3 }))).toEqual(
-      createDocument([createElement('paragraph', [createText('a')])]),
-    )
+    expect(
+      applySteps(doc, deleteRange(doc, { path: [0, 0], offset: 1 }, { path: [0, 0], offset: 3 })),
+    ).toEqual(createDocument([createElement('paragraph', [createText('a')])]))
   })
 
   it('同一块内跨文本节点删除', () => {
     const doc = createDocument([
       createElement('paragraph', [createText('ab', [{ type: 'bold' }]), createText('c')]),
     ])
-    expect(applySteps(doc, deleteRange(doc, { path: [0, 0], offset: 1 }, { path: [0, 1], offset: 1 }))).toEqual(
-      createDocument([createElement('paragraph', [createText('a', [{ type: 'bold' }])])]),
-    )
+    expect(
+      applySteps(doc, deleteRange(doc, { path: [0, 0], offset: 1 }, { path: [0, 1], offset: 1 })),
+    ).toEqual(createDocument([createElement('paragraph', [createText('a', [{ type: 'bold' }])])]))
   })
 
   it('选区起点落在文本节点末尾：保留该节点前半段', () => {
@@ -94,7 +96,10 @@ describe('deleteRange', () => {
       createElement('paragraph', [createText('ab')]),
       createElement('paragraph', [createText('cd')]),
     ])
-    const result = applySteps(doc, deleteRange(doc, { path: [0, 0], offset: 1 }, { path: [1, 0], offset: 1 }))
+    const result = applySteps(
+      doc,
+      deleteRange(doc, { path: [0, 0], offset: 1 }, { path: [1, 0], offset: 1 }),
+    )
     expect(result).toEqual(createDocument([createElement('paragraph', [createText('ad')])]))
   })
 
@@ -190,7 +195,10 @@ describe('deleteBackward / deleteForward', () => {
   it('选区删除', () => {
     const doc = createDocument([createElement('paragraph', [createText('abc')])])
     expect(
-      applySteps(doc, deleteBackward(doc, { path: [0, 0], offset: 1 }, { path: [0, 0], offset: 3 })),
+      applySteps(
+        doc,
+        deleteBackward(doc, { path: [0, 0], offset: 1 }, { path: [0, 0], offset: 3 }),
+      ),
     ).toEqual(createDocument([createElement('paragraph', [createText('a')])]))
   })
 })
@@ -342,9 +350,7 @@ describe('splitBlock', () => {
   })
 
   it('标题末尾回车：新块回到正文（Word/WPS）', () => {
-    const doc = createDocument([
-      createElement('heading', [createText('标题')], { level: 2 }),
-    ])
+    const doc = createDocument([createElement('heading', [createText('标题')], { level: 2 })])
     const { steps, caret } = splitBlock(doc, { path: [0, 0], offset: 2 })
     expect(applySteps(doc, steps)).toEqual(
       createDocument([
@@ -436,9 +442,7 @@ describe('splitBlock', () => {
   })
 
   it('标题中间回车：仍拆成标题', () => {
-    const doc = createDocument([
-      createElement('heading', [createText('标题')], { level: 2 }),
-    ])
+    const doc = createDocument([createElement('heading', [createText('标题')], { level: 2 })])
     const { steps } = splitBlock(doc, { path: [0, 0], offset: 1 })
     expect(applySteps(doc, steps)).toEqual(
       createDocument([
@@ -587,7 +591,10 @@ describe('列表切换（多块 / 嵌套）', () => {
 describe('toggleMark', () => {
   it('整个文本节点加粗', () => {
     const doc = createDocument([createElement('paragraph', [createText('abc')])])
-    const result = applySteps(doc, toggleMark(doc, { path: [0, 0], offset: 0 }, { path: [0, 0], offset: 3 }, 'bold'))
+    const result = applySteps(
+      doc,
+      toggleMark(doc, { path: [0, 0], offset: 0 }, { path: [0, 0], offset: 3 }, 'bold'),
+    )
     expect(result).toEqual(
       createDocument([createElement('paragraph', [createText('abc', [{ type: 'bold' }])])]),
     )
@@ -595,17 +602,27 @@ describe('toggleMark', () => {
 
   it('部分文本加粗（自动拆分）', () => {
     const doc = createDocument([createElement('paragraph', [createText('abc')])])
-    const result = applySteps(doc, toggleMark(doc, { path: [0, 0], offset: 1 }, { path: [0, 0], offset: 2 }, 'bold'))
+    const result = applySteps(
+      doc,
+      toggleMark(doc, { path: [0, 0], offset: 1 }, { path: [0, 0], offset: 2 }, 'bold'),
+    )
     expect(result).toEqual(
       createDocument([
-        createElement('paragraph', [createText('a'), createText('b', [{ type: 'bold' }]), createText('c')]),
+        createElement('paragraph', [
+          createText('a'),
+          createText('b', [{ type: 'bold' }]),
+          createText('c'),
+        ]),
       ]),
     )
   })
 
   it('跨文本节点加粗', () => {
     const doc = createDocument([createElement('paragraph', [createText('ab'), createText('cd')])])
-    const result = applySteps(doc, toggleMark(doc, { path: [0, 0], offset: 1 }, { path: [0, 1], offset: 1 }, 'bold'))
+    const result = applySteps(
+      doc,
+      toggleMark(doc, { path: [0, 0], offset: 1 }, { path: [0, 1], offset: 1 }, 'bold'),
+    )
     expect(result).toEqual(
       createDocument([
         createElement('paragraph', [
@@ -619,8 +636,13 @@ describe('toggleMark', () => {
   })
 
   it('再次切换取消加粗', () => {
-    const doc = createDocument([createElement('paragraph', [createText('abc', [{ type: 'bold' }])])])
-    const result = applySteps(doc, toggleMark(doc, { path: [0, 0], offset: 0 }, { path: [0, 0], offset: 3 }, 'bold'))
+    const doc = createDocument([
+      createElement('paragraph', [createText('abc', [{ type: 'bold' }])]),
+    ])
+    const result = applySteps(
+      doc,
+      toggleMark(doc, { path: [0, 0], offset: 0 }, { path: [0, 0], offset: 3 }, 'bold'),
+    )
     expect(result).toEqual(createDocument([createElement('paragraph', [createText('abc')])]))
   })
 

@@ -24,7 +24,16 @@
     "lint": "oxlint",
     "test": "vitest",
     "e2e": "playwright test",
-    "prepublishOnly": "pnpm run build"
+    "prepublishOnly": "pnpm run build",
+    "prepare": "husky",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "lint-staged": {
+    "*.{ts,tsx,js,mjs,cjs,json,css,html}": [
+      "prettier --write",
+      "oxlint --fix"
+    ]
   },
   "keywords": [
     "word",
@@ -38,7 +47,10 @@
     "@playwright/test": "^1.65.0",
     "@types/node": "^24.19.2",
     "happy-dom": "^21.0.4",
+    "husky": "^9.1.7",
+    "lint-staged": "^17.6.1",
     "oxlint": "^1.90.0",
+    "prettier": "^3.10.1",
     "typescript": "~7.0.2",
     "vite": "^8.3.6",
     "vitest": "^5.1.0"

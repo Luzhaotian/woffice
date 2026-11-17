@@ -76,7 +76,10 @@ export function getMarksAtPosition(doc: Document, pos: Position): Mark[] | undef
   return marksOfSubtree(right, 'forward')
 }
 
-function marksOfSubtree(node: Node | undefined, direction: 'forward' | 'backward'): Mark[] | undefined {
+function marksOfSubtree(
+  node: Node | undefined,
+  direction: 'forward' | 'backward',
+): Mark[] | undefined {
   if (!node) return undefined
   if (isText(node)) return node.marks
   if (isVoid(node)) return undefined
@@ -115,10 +118,7 @@ export function insertTextAt(
   if (isText(node)) {
     // 带 marks 的插入（如修订模式 / 待输入格式）：若新格式与当前节点不同，
     // 在插入点拆分文本节点，只给新文本加标记；若相同则直接替换（光标路径更稳）。
-    const sameMarks = marksEqual(
-      normalizeMarks(node.marks) ?? [],
-      normalizeMarks(marks) ?? [],
-    )
+    const sameMarks = marksEqual(normalizeMarks(node.marks) ?? [], normalizeMarks(marks) ?? [])
     if (marks !== undefined && !sameMarks) {
       const parentPath = pos.path.slice(0, -1)
       const index = pos.path[pos.path.length - 1]
@@ -126,7 +126,8 @@ export function insertTextAt(
       if (pos.offset > 0) parts.push(createText(node.text.slice(0, pos.offset), node.marks))
       const newIndex = index + (pos.offset > 0 ? 1 : 0)
       parts.push(createText(text, marks))
-      if (pos.offset < node.text.length) parts.push(createText(node.text.slice(pos.offset), node.marks))
+      if (pos.offset < node.text.length)
+        parts.push(createText(node.text.slice(pos.offset), node.marks))
       return {
         steps: [new ReplaceChildrenStep(parentPath, index, index + 1, parts, [node])],
         caret: { path: [...parentPath, newIndex], offset: text.length },
@@ -139,7 +140,9 @@ export function insertTextAt(
   }
   if (isElement(node)) {
     return {
-      steps: [new ReplaceChildrenStep(pos.path, pos.offset, pos.offset, [createText(text, marks)], [])],
+      steps: [
+        new ReplaceChildrenStep(pos.path, pos.offset, pos.offset, [createText(text, marks)], []),
+      ],
       caret: { path: [...pos.path, pos.offset], offset: text.length },
     }
   }
@@ -156,7 +159,9 @@ export function deleteRange(doc: Document, from: Position, to: Position): Step[]
   // 同一文本节点
   if (isSamePath(a.path, b.path)) {
     if (nodeA && isText(nodeA)) {
-      return [new ReplaceTextStep(a.path, a.offset, b.offset, '', nodeA.text.slice(a.offset, b.offset))]
+      return [
+        new ReplaceTextStep(a.path, a.offset, b.offset, '', nodeA.text.slice(a.offset, b.offset)),
+      ]
     }
     return []
   }
@@ -177,7 +182,11 @@ function deleteWithinParent(doc: Document, parentPath: Path, a: Position, b: Pos
   if (indexA === indexB) {
     const child = getNodeAt(doc, a.path)
     if (child && isElement(child)) {
-      return deleteRange(doc, { path: a.path, offset: a.offset }, { path: b.path, offset: b.offset })
+      return deleteRange(
+        doc,
+        { path: a.path, offset: a.offset },
+        { path: b.path, offset: b.offset },
+      )
     }
     return []
   }
@@ -250,7 +259,13 @@ function deleteAcrossBlocks(doc: Document, a: Position, b: Position): Step[] {
   const target = working.children[blockA]
   if (!mergedB || !isElement(mergedB) || !target || !isElement(target)) throw new Error('块不存在')
   steps.push(
-    new ReplaceChildrenStep([blockA], target.children.length, target.children.length, mergedB.children, []),
+    new ReplaceChildrenStep(
+      [blockA],
+      target.children.length,
+      target.children.length,
+      mergedB.children,
+      [],
+    ),
   )
   working = steps[steps.length - 1].apply(working)
 
@@ -265,7 +280,9 @@ export function deleteBackward(doc: Document, from: Position, to?: Position): St
   if (to && comparePosition(from, to) !== 0) return deleteRange(doc, from, to)
   const node = getNodeAt(doc, from.path)
   if (node && isText(node) && from.offset > 0) {
-    return [new ReplaceTextStep(from.path, from.offset - 1, from.offset, '', node.text[from.offset - 1])]
+    return [
+      new ReplaceTextStep(from.path, from.offset - 1, from.offset, '', node.text[from.offset - 1]),
+    ]
   }
 
   // 光标在嵌套块开头（如 list_item / blockquote 里的段落）
@@ -340,7 +357,9 @@ export function deleteForward(doc: Document, from: Position, to?: Position): Ste
   if (to && comparePosition(from, to) !== 0) return deleteRange(doc, from, to)
   const node = getNodeAt(doc, from.path)
   if (node && isText(node) && from.offset < node.text.length) {
-    return [new ReplaceTextStep(from.path, from.offset, from.offset + 1, '', node.text[from.offset])]
+    return [
+      new ReplaceTextStep(from.path, from.offset, from.offset + 1, '', node.text[from.offset]),
+    ]
   }
 
   // 光标在嵌套块末尾：优先并入后一个兄弟块
@@ -399,9 +418,7 @@ function exitNestedBlock(doc: Document, containerPath: Path): Step[] {
     const listPath = parentPath
     const list = parent
     const item = container
-    const steps: Step[] = [
-      new ReplaceChildrenStep(listPath, index, index + 1, [], [item]),
-    ]
+    const steps: Step[] = [new ReplaceChildrenStep(listPath, index, index + 1, [], [item])]
     if (list.children.length === 1) {
       steps.push(new ReplaceChildrenStep([], listPath[0], listPath[0] + 1, [], [list]))
     }
@@ -591,7 +608,13 @@ export function splitBlock(
     steps: [
       // 原文本节点及其后续兄弟，替换为前半段
       // （后半段与后续兄弟会移到新块，必须从原块移除，否则内容会被复制）
-      new ReplaceChildrenStep(parentPath, textIndex, parent.children.length, [before], [node, ...rest]),
+      new ReplaceChildrenStep(
+        parentPath,
+        textIndex,
+        parent.children.length,
+        [before],
+        [node, ...rest],
+      ),
       // 后半段 + 后续兄弟节点，移入一个新块
       new ReplaceChildrenStep(
         grandParentPath,
@@ -606,7 +629,13 @@ export function splitBlock(
 }
 
 /** 在选区范围内切换 mark（跨文本节点时自动拆分；可携带 attrs，如 link 的 href） */
-export function toggleMark(doc: Document, from: Position, to: Position, markType: string, markAttrs?: Attrs): Step[] {
+export function toggleMark(
+  doc: Document,
+  from: Position,
+  to: Position,
+  markType: string,
+  markAttrs?: Attrs,
+): Step[] {
   const { from: a, to: b } = selectionRange(createSelection(from, to))
   if (comparePosition(a, b) === 0) return []
 
@@ -703,9 +732,11 @@ function convertBlocks(block: Node, targetType: string, attrs?: Attrs): Node[] {
     if (source === 'list') return [createElementNode(targetType, block.children, attrs)]
     const content = source === 'inline' ? block.children : toInlineContent(block)
     return [
-      createElementNode(targetType, [
-        createElementNode('list_item', [createElementNode('paragraph', content)]),
-      ], attrs),
+      createElementNode(
+        targetType,
+        [createElementNode('list_item', [createElementNode('paragraph', content)])],
+        attrs,
+      ),
     ]
   }
 
@@ -743,7 +774,11 @@ export function setBlockType(doc: Document, blockPath: Path, type: string, attrs
 }
 
 /** 把块包进列表（list > list_item > 原内容） */
-export function wrapInList(doc: Document, blockPath: Path, listType: 'bullet_list' | 'ordered_list'): Step[] {
+export function wrapInList(
+  doc: Document,
+  blockPath: Path,
+  listType: 'bullet_list' | 'ordered_list',
+): Step[] {
   const index = blockPath[0]
   const block = doc.children[index]
   if (!block || !isElement(block)) throw new Error('块不存在')
@@ -827,7 +862,8 @@ export function splitListItem(
     } else if (i > textIndex) {
       afterChildren.push(child)
     } else if (isText(child)) {
-      if (pos.offset > 0) beforeChildren.push(createText(child.text.slice(0, pos.offset), child.marks))
+      if (pos.offset > 0)
+        beforeChildren.push(createText(child.text.slice(0, pos.offset), child.marks))
       if (pos.offset < child.text.length) {
         afterChildren.push(createText(child.text.slice(pos.offset), child.marks))
       }
@@ -955,11 +991,7 @@ export function outdentListItem(
   steps.push(
     new ReplaceChildrenStep(outerListPath, outerItemIndex + 1, outerItemIndex + 1, [loc.item], []),
   )
-  const caretPath = [
-    ...outerListPath,
-    outerItemIndex + 1,
-    ...pos.path.slice(loc.itemPath.length),
-  ]
+  const caretPath = [...outerListPath, outerItemIndex + 1, ...pos.path.slice(loc.itemPath.length)]
   return { steps, caret: { path: caretPath, offset: pos.offset } }
 }
 
@@ -999,7 +1031,13 @@ export function toggleListBlocks(
   }
   if (items.length === 0) return []
   return [
-    new ReplaceChildrenStep([], fromIndex, toIndex + 1, [createElementNode(listType, items)], blocks),
+    new ReplaceChildrenStep(
+      [],
+      fromIndex,
+      toIndex + 1,
+      [createElementNode(listType, items)],
+      blocks,
+    ),
   ]
 }
 

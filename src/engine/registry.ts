@@ -35,7 +35,9 @@ export class KeymapTable {
     for (const [combo, command] of Object.entries(map)) this.map.set(combo, command)
   }
 
-  resolve(event: Pick<KeyboardEvent, 'key' | 'ctrlKey' | 'metaKey' | 'shiftKey' | 'altKey'>): string | undefined {
+  resolve(
+    event: Pick<KeyboardEvent, 'key' | 'ctrlKey' | 'metaKey' | 'shiftKey' | 'altKey'>,
+  ): string | undefined {
     return this.map.get(comboFromEvent(event))
   }
 }

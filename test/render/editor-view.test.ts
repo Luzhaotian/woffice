@@ -117,10 +117,14 @@ describe('EditorView 输入闭环', () => {
       createDocument([createElement('paragraph', [createText('Hello World')])]),
     )
 
-    content.dispatchEvent(new KeyboardEvent('keydown', { key: 'z', ctrlKey: true, bubbles: true, cancelable: true }))
+    content.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'z', ctrlKey: true, bubbles: true, cancelable: true }),
+    )
     expect(editor.doc).toEqual(createDocument([createElement('paragraph', [createText('Hello')])]))
 
-    content.dispatchEvent(new KeyboardEvent('keydown', { key: 'y', ctrlKey: true, bubbles: true, cancelable: true }))
+    content.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'y', ctrlKey: true, bubbles: true, cancelable: true }),
+    )
     expect(editor.doc).toEqual(
       createDocument([createElement('paragraph', [createText('Hello World')])]),
     )

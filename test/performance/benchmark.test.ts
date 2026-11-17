@@ -19,7 +19,9 @@ beforeEach(() => {
 function buildLargeDoc(paragraphs: number) {
   const children = []
   for (let i = 0; i < paragraphs; i++) {
-    children.push(createElement('paragraph', [createText(`第 ${i + 1} 段：这是一段用于性能测试的示例文字。`)]))
+    children.push(
+      createElement('paragraph', [createText(`第 ${i + 1} 段：这是一段用于性能测试的示例文字。`)]),
+    )
   }
   return createDocument(children)
 }

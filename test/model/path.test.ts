@@ -64,6 +64,8 @@ describe('path', () => {
 
   it('comparePosition', () => {
     expect(comparePosition({ path: [0], offset: 5 }, { path: [0], offset: 3 })).toBeGreaterThan(0)
-    expect(comparePosition({ path: [0, 1], offset: 0 }, { path: [0, 2], offset: 0 })).toBeLessThan(0)
+    expect(comparePosition({ path: [0, 1], offset: 0 }, { path: [0, 2], offset: 0 })).toBeLessThan(
+      0,
+    )
   })
 })

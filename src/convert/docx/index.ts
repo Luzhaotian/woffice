@@ -58,7 +58,11 @@ export function parseComments(xml: string): Map<string, CommentInfo> {
     const author = comment.getAttribute('w:author') ?? ''
     const paragraphs = elementsByLocalName(comment, 'p')
     const text = paragraphs
-      .map((p) => elementsByLocalName(p, 't').map((t) => t.textContent ?? '').join(''))
+      .map((p) =>
+        elementsByLocalName(p, 't')
+          .map((t) => t.textContent ?? '')
+          .join(''),
+      )
       .join('\n')
     map.set(id, { id, text, author })
   }

@@ -53,7 +53,9 @@ describe('Editor', () => {
   })
 
   it('setNodeAttrs / setMarks 与撤销', () => {
-    const editor = new Editor(createDocument([createElement('heading', [createText('t')], { level: 1 })]))
+    const editor = new Editor(
+      createDocument([createElement('heading', [createText('t')], { level: 1 })]),
+    )
     editor.setNodeAttrs([0], { level: 3 })
     expect(editor.doc.children[0]).toMatchObject({ type: 'heading', attrs: { level: 3 } })
     editor.undo()

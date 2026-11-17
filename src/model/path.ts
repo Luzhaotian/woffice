@@ -58,7 +58,12 @@ export function commonAncestor(a: Path, b: Path): Path {
 }
 
 export function isSibling(a: Path, b: Path): boolean {
-  return a.length === b.length && a.length > 0 && !isSamePath(a, b) && compare(parent(a), parent(b)) === 0
+  return (
+    a.length === b.length &&
+    a.length > 0 &&
+    !isSamePath(a, b) &&
+    compare(parent(a), parent(b)) === 0
+  )
 }
 
 // ---------------------------------------------------------------------------

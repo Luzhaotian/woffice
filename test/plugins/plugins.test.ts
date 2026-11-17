@@ -55,7 +55,13 @@ describe('插件系统', () => {
     expect(editor.schema.nodes.map((n) => n.type)).toContain('spoiler')
     expect(editor.commands.has('spoiler.toggle')).toBe(true)
     expect(
-      editor.keymap.resolve({ key: 's', ctrlKey: true, metaKey: false, shiftKey: false, altKey: true }),
+      editor.keymap.resolve({
+        key: 's',
+        ctrlKey: true,
+        metaKey: false,
+        shiftKey: false,
+        altKey: true,
+      }),
     ).toBe('spoiler.toggle')
 
     editor.commands.run('spoiler.toggle')
@@ -71,7 +77,9 @@ describe('插件系统', () => {
     expect(editor.keymap.resolve({ ...base, key: 'b', ctrlKey: true })).toBe('mark.bold')
     expect(editor.keymap.resolve({ ...base, key: 'i', ctrlKey: true })).toBe('mark.italic')
     expect(editor.keymap.resolve({ ...base, key: 'z', ctrlKey: true })).toBe('history.undo')
-    expect(editor.keymap.resolve({ ...base, key: 'Z', ctrlKey: true, shiftKey: true })).toBe('history.redo')
+    expect(editor.keymap.resolve({ ...base, key: 'Z', ctrlKey: true, shiftKey: true })).toBe(
+      'history.redo',
+    )
     expect(editor.keymap.resolve({ ...base, key: 'x', ctrlKey: true })).toBeUndefined()
   })
 })
@@ -118,7 +126,11 @@ describe('内置命令', () => {
     editor.commands.run('mark.italic')
     expect(editor.doc).toEqual(
       createDocument([
-        createElement('paragraph', [createText('h'), createText('ell', [{ type: 'italic' }]), createText('o')]),
+        createElement('paragraph', [
+          createText('h'),
+          createText('ell', [{ type: 'italic' }]),
+          createText('o'),
+        ]),
       ]),
     )
   })
@@ -178,7 +190,10 @@ describe('内置命令', () => {
   })
 
   it('block.hr：空段落插入分割线后光标在分割线下方', () => {
-    const doc = createDocument([createElement('paragraph', [createText('a')]), createElement('paragraph')])
+    const doc = createDocument([
+      createElement('paragraph', [createText('a')]),
+      createElement('paragraph'),
+    ])
     const editor = createEditor(doc, { path: [1, 0], offset: 0 })
     editor.commands.run('block.hr')
     expect(editor.doc.children.map((b) => b.type)).toEqual([
@@ -212,7 +227,10 @@ describe('内置命令', () => {
 describe('插件渲染', () => {
   it('page_break 使用插件自定义渲染', () => {
     const editor = new Editor(
-      createDocument([createElement('paragraph', [createText('a')]), { type: 'page_break', void: true }]),
+      createDocument([
+        createElement('paragraph', [createText('a')]),
+        { type: 'page_break', void: true },
+      ]),
     )
     const container = document.createElement('div')
     document.body.appendChild(container)

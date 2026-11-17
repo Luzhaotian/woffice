@@ -98,7 +98,8 @@ export class Editor {
    */
   setStoredMarks(marks: Mark[] | undefined, pos: Position): void {
     this.storedMarks = marks
-    this.storedMarksPos = marks === undefined ? undefined : { path: [...pos.path], offset: pos.offset }
+    this.storedMarksPos =
+      marks === undefined ? undefined : { path: [...pos.path], offset: pos.offset }
   }
 
   /** 清除待输入格式（输入一次之后，格式已由新文本自身携带） */

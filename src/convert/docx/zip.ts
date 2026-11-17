@@ -54,12 +54,16 @@ export function crc32(data: Uint8Array): number {
 }
 
 async function inflateRaw(data: Uint8Array): Promise<Uint8Array> {
-  const stream = new Blob([data as BlobPart]).stream().pipeThrough(new DecompressionStream('deflate-raw'))
+  const stream = new Blob([data as BlobPart])
+    .stream()
+    .pipeThrough(new DecompressionStream('deflate-raw'))
   return new Uint8Array(await new Response(stream).arrayBuffer())
 }
 
 async function deflateRaw(data: Uint8Array): Promise<Uint8Array> {
-  const stream = new Blob([data as BlobPart]).stream().pipeThrough(new CompressionStream('deflate-raw'))
+  const stream = new Blob([data as BlobPart])
+    .stream()
+    .pipeThrough(new CompressionStream('deflate-raw'))
   return new Uint8Array(await new Response(stream).arrayBuffer())
 }
 
@@ -103,7 +107,10 @@ export class ZipReader {
       const localHeaderOffset = view.getUint32(offset + 42, true)
       const name = utf8Decode(data.subarray(offset + 46, offset + 46 + nameLength))
 
-      if (localHeaderOffset + 30 > data.length || view.getUint32(localHeaderOffset, true) !== LOCAL_SIGNATURE) {
+      if (
+        localHeaderOffset + 30 > data.length ||
+        view.getUint32(localHeaderOffset, true) !== LOCAL_SIGNATURE
+      ) {
         throw new Error(`ZIP 本地头损坏: ${name}`)
       }
       const localNameLength = view.getUint16(localHeaderOffset + 26, true)

@@ -5,9 +5,24 @@
  */
 
 import type { Attrs, Document, Mark, Node } from '@/model/node'
-import { createDocument, createElement, createText, createVoid, isElement, isText } from '@/model/node'
+import {
+  createDocument,
+  createElement,
+  createText,
+  createVoid,
+  isElement,
+  isText,
+} from '@/model/node'
 import { normalize } from '@/model/normalize'
-import { child, children, elementByLocalName, elementsByLocalName, has, parseXml, val } from '@/convert/docx/ooxml'
+import {
+  child,
+  children,
+  elementByLocalName,
+  elementsByLocalName,
+  has,
+  parseXml,
+  val,
+} from '@/convert/docx/ooxml'
 import type { NumberingInfo } from '@/convert/docx/numbering'
 
 export interface ImportOptions {
@@ -171,9 +186,13 @@ function parseParagraph(el: Element, options: ImportOptions): ParsedParagraph {
       const type = node.localName === 'ins' ? 'track_insert' : 'track_delete'
       const extraMark: Mark = {
         type,
-        attrs: { author: node.getAttribute('w:author') ?? '', date: node.getAttribute('w:date') ?? '' },
+        attrs: {
+          author: node.getAttribute('w:author') ?? '',
+          date: node.getAttribute('w:date') ?? '',
+        },
       }
-      for (const r of children(node, 'r')) inline.push(...parseRun(r, options, activeComments, extraMark))
+      for (const r of children(node, 'r'))
+        inline.push(...parseRun(r, options, activeComments, extraMark))
     } else if (node.localName === 'commentRangeStart') {
       const id = node.getAttribute('w:id') ?? ''
       if (id) activeComments.add(id)
@@ -206,7 +225,12 @@ function parseParagraph(el: Element, options: ImportOptions): ParsedParagraph {
 // 运行 / 行内
 // ---------------------------------------------------------------------------
 
-function parseRun(r: Element, options: ImportOptions, activeComments?: Set<string>, extraMark?: Mark): Node[] {
+function parseRun(
+  r: Element,
+  options: ImportOptions,
+  activeComments?: Set<string>,
+  extraMark?: Mark,
+): Node[] {
   const rPr = child(r, 'rPr')
   const marks: Mark[] = []
   if (rPr) {
@@ -215,7 +239,8 @@ function parseRun(r: Element, options: ImportOptions, activeComments?: Set<strin
     if (has(rPr, 'u')) marks.push({ type: 'underline' })
     if (has(rPr, 'strike')) marks.push({ type: 'strikethrough' })
     const highlight = val(rPr, 'highlight')
-    if (highlight && highlight !== 'none') marks.push({ type: 'highlight', attrs: { color: highlight } })
+    if (highlight && highlight !== 'none')
+      marks.push({ type: 'highlight', attrs: { color: highlight } })
     const color = val(rPr, 'color')
     if (color && color !== 'auto') marks.push({ type: 'font_color', attrs: { color } })
     const sz = val(rPr, 'sz')
@@ -227,7 +252,10 @@ function parseRun(r: Element, options: ImportOptions, activeComments?: Set<strin
   if (activeComments) {
     for (const id of activeComments) {
       const info = options.comments?.get(id)
-      marks.push({ type: 'comment', attrs: { id, text: info?.text ?? '', author: info?.author ?? '' } })
+      marks.push({
+        type: 'comment',
+        attrs: { id, text: info?.text ?? '', author: info?.author ?? '' },
+      })
     }
   }
 
@@ -281,7 +309,8 @@ function parseImage(node: Element, options: ImportOptions): Node | undefined {
   if (!data) return undefined
 
   const ext = mediaPath.split('.').pop()?.toLowerCase() ?? 'png'
-  const mime = ext === 'jpeg' || ext === 'jpg' ? 'image/jpeg' : ext === 'gif' ? 'image/gif' : 'image/png'
+  const mime =
+    ext === 'jpeg' || ext === 'jpg' ? 'image/jpeg' : ext === 'gif' ? 'image/gif' : 'image/png'
   const attrs: Attrs = { src: `data:${mime};base64,${uint8ToBase64(data)}` }
 
   // 从 wp:extent 读回尺寸（EMU → 像素）
@@ -383,7 +412,13 @@ function parseTable(tbl: Element, options: ImportOptions): Node {
       const attrs: Attrs = {}
       if (cell.colspan > 1) attrs.colspan = cell.colspan
       if (cell.rowspan > 1) attrs.rowspan = cell.rowspan
-      cells.push(createElement('table_cell', cell.children, Object.keys(attrs).length > 0 ? attrs : undefined))
+      cells.push(
+        createElement(
+          'table_cell',
+          cell.children,
+          Object.keys(attrs).length > 0 ? attrs : undefined,
+        ),
+      )
     }
     return createElement('table_row', cells)
   })

@@ -95,13 +95,19 @@ describe('docx 导入导出', () => {
       createDocument([
         createElement('table', [
           createElement('table_row', [
-            createElement('table_cell', [createElement('paragraph', [createText('跨两列')])], { colspan: 2 }),
+            createElement('table_cell', [createElement('paragraph', [createText('跨两列')])], {
+              colspan: 2,
+            }),
           ]),
           createElement('table_row', [
-            createElement('table_cell', [createElement('paragraph', [createText('跨行')])], { rowspan: 2 }),
+            createElement('table_cell', [createElement('paragraph', [createText('跨行')])], {
+              rowspan: 2,
+            }),
             createElement('table_cell', [createElement('paragraph', [createText('右 1')])]),
           ]),
-          createElement('table_row', [createElement('table_cell', [createElement('paragraph', [createText('右 2')])])]),
+          createElement('table_row', [
+            createElement('table_cell', [createElement('paragraph', [createText('右 2')])]),
+          ]),
         ]),
       ]),
     )
@@ -139,7 +145,9 @@ describe('docx 导入导出', () => {
     const png = utf8Encode('fake-png-bytes')
     const src = `data:image/png;base64,${btoa(String.fromCharCode(...png))}`
     const doc = normalize(
-      createDocument([createElement('paragraph', [createVoid('image', { src, width: 10, height: 10 })])]),
+      createDocument([
+        createElement('paragraph', [createVoid('image', { src, width: 10, height: 10 })]),
+      ]),
     )
     const blob = await exportDocx(doc)
     const reader = await ZipReader.parse(await blob.arrayBuffer())
@@ -213,7 +221,9 @@ describe('docx 导入导出', () => {
       createDocument([
         createElement('paragraph', [
           createText('这是一段'),
-          createText('带批注', [{ type: 'comment', attrs: { id: '0', text: '这里需要修改', author: '张三' } }]),
+          createText('带批注', [
+            { type: 'comment', attrs: { id: '0', text: '这里需要修改', author: '张三' } },
+          ]),
           createText('的文字'),
         ]),
       ]),
@@ -246,7 +256,9 @@ describe('docx 导入导出', () => {
         createDocument([
           createElement('paragraph', [
             createText('这是一段'),
-            createText('带批注', [{ type: 'comment', attrs: { id: '0', text: '这里需要修改', author: '张三' } }]),
+            createText('带批注', [
+              { type: 'comment', attrs: { id: '0', text: '这里需要修改', author: '张三' } },
+            ]),
           ]),
         ]),
       ),

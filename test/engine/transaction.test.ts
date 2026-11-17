@@ -11,7 +11,9 @@ describe('Transaction', () => {
     const tr = new Transaction(state)
     tr.addStep(new ReplaceTextStep([0, 0], 1, 1, 'X', ''))
     tr.addStep(new ReplaceTextStep([0, 0], 2, 2, 'Y', ''))
-    expect(tr.apply().doc).toEqual(createDocument([createElement('paragraph', [createText('aXYb')])]))
+    expect(tr.apply().doc).toEqual(
+      createDocument([createElement('paragraph', [createText('aXYb')])]),
+    )
   })
 
   it('invert 可还原到初始文档', () => {
@@ -46,9 +48,13 @@ describe('Transaction', () => {
   })
 
   it('提交时 normalize（合并相邻同 marks 文本）', () => {
-    const state = createState(createDocument([createElement('paragraph', [createText('a'), createText('b')])]))
+    const state = createState(
+      createDocument([createElement('paragraph', [createText('a'), createText('b')])]),
+    )
     const tr = new Transaction(state)
     tr.addStep(new ReplaceTextStep([0, 1], 1, 1, 'c', ''))
-    expect(tr.apply().doc).toEqual(createDocument([createElement('paragraph', [createText('abc')])]))
+    expect(tr.apply().doc).toEqual(
+      createDocument([createElement('paragraph', [createText('abc')])]),
+    )
   })
 })

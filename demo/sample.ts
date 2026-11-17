@@ -23,7 +23,9 @@ export function createSampleDocument(): Document {
     ]),
     createElement('bullet_list', [
       createElement('list_item', [
-        createElement('paragraph', [createText('自研文档模型与编辑引擎（模型 / 引擎 / 渲染分层）')]),
+        createElement('paragraph', [
+          createText('自研文档模型与编辑引擎（模型 / 引擎 / 渲染分层）'),
+        ]),
       ]),
       createElement('list_item', [
         createElement('paragraph', [createText('docx 导入导出（OOXML + zip 完全自研）')]),

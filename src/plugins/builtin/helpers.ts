@@ -26,7 +26,9 @@ import type { Editor } from '@/editor'
 /** 读取用户输入的链接地址（无 DOM / 无 prompt 环境返回空串） */
 function promptUrl(): string {
   if (typeof window === 'undefined') return ''
-  const w = window as unknown as { prompt?: (message?: string, defaultValue?: string) => string | null }
+  const w = window as unknown as {
+    prompt?: (message?: string, defaultValue?: string) => string | null
+  }
   return typeof w.prompt === 'function' ? (w.prompt('链接地址', 'https://') ?? '') : ''
 }
 
@@ -60,9 +62,11 @@ export function addComment(editor: Editor, textArg?: string): boolean {
   const range = editor.getSelection()
   if (!range) return false
   const collapsed =
-    range.anchor.path.join('.') === range.head.path.join('.') && range.anchor.offset === range.head.offset
+    range.anchor.path.join('.') === range.head.path.join('.') &&
+    range.anchor.offset === range.head.offset
   if (collapsed) return false
-  const text = textArg ?? (typeof window !== 'undefined' ? window.prompt('批注内容', '') ?? '' : '')
+  const text =
+    textArg ?? (typeof window !== 'undefined' ? (window.prompt('批注内容', '') ?? '') : '')
   if (!text) return false
 
   let maxId = -1
@@ -106,7 +110,12 @@ export function setHeading(editor: Editor, level: number): boolean {
   const isCurrent = block?.type === 'heading' && block.attrs?.level === level
   return dispatch(
     editor,
-    setBlockType(editor.doc, [index], isCurrent ? 'paragraph' : 'heading', isCurrent ? {} : { level }),
+    setBlockType(
+      editor.doc,
+      [index],
+      isCurrent ? 'paragraph' : 'heading',
+      isCurrent ? {} : { level },
+    ),
   )
 }
 
@@ -116,12 +125,17 @@ export function setParagraph(editor: Editor): boolean {
   return dispatch(editor, setBlockType(editor.doc, [index], 'paragraph'))
 }
 
-export function toggleMark(editor: Editor, markType: string, attrs?: Record<string, unknown>): boolean {
+export function toggleMark(
+  editor: Editor,
+  markType: string,
+  attrs?: Record<string, unknown>,
+): boolean {
   const range = editor.getSelection()
   if (!range) return false
 
   const collapsed =
-    range.anchor.path.join('.') === range.head.path.join('.') && range.anchor.offset === range.head.offset
+    range.anchor.path.join('.') === range.head.path.join('.') &&
+    range.anchor.offset === range.head.offset
   if (collapsed) {
     // 折叠光标：不改已有文字，只切换"待输入格式"（Word/WPS 行为）
     const pos = editor.getCaret() ?? range.anchor
@@ -142,7 +156,8 @@ export function toggleLink(editor: Editor, urlArg?: string): boolean {
   const range = editor.getSelection()
   if (!range) return false
   const collapsed =
-    range.anchor.path.join('.') === range.head.path.join('.') && range.anchor.offset === range.head.offset
+    range.anchor.path.join('.') === range.head.path.join('.') &&
+    range.anchor.offset === range.head.offset
   if (collapsed) return false
   const url = urlArg ?? promptUrl()
   if (!url) return false
@@ -162,8 +177,7 @@ function toggleList(editor: Editor, listType: 'bullet_list' | 'ordered_list'): b
   const range = editor.getSelection()
   if (range) {
     const { from, to } = selectionRange(range)
-    const collapsed =
-      from.path.join('.') === to.path.join('.') && from.offset === to.offset
+    const collapsed = from.path.join('.') === to.path.join('.') && from.offset === to.offset
     if (!collapsed && from.path[0] !== to.path[0]) {
       return dispatch(editor, toggleListBlocks(editor.doc, from.path[0], to.path[0], listType))
     }

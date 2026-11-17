@@ -15,57 +15,69 @@ import { test, expect, Page } from '@playwright/test'
 
 /** 选中某元素内的全部文本（编辑器位置是文本节点位置，不能用元素范围） */
 async function selectAll(page: Page, selector: string): Promise<void> {
-  await page.locator(selector).first().evaluate((el) => {
-    const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT)
-    const texts: Text[] = []
-    let node: Node | null
-    while ((node = walker.nextNode())) texts.push(node as Text)
-    if (texts.length === 0) return
-    const range = document.createRange()
-    range.setStart(texts[0], 0)
-    range.setEnd(texts[texts.length - 1], texts[texts.length - 1].data.length)
-    const sel = window.getSelection()!
-    sel.removeAllRanges()
-    sel.addRange(range)
-    document.dispatchEvent(new Event('selectionchange'))
-  })
+  await page
+    .locator(selector)
+    .first()
+    .evaluate((el) => {
+      const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT)
+      const texts: Text[] = []
+      let node: Node | null
+      while ((node = walker.nextNode())) texts.push(node as Text)
+      if (texts.length === 0) return
+      const range = document.createRange()
+      range.setStart(texts[0], 0)
+      range.setEnd(texts[texts.length - 1], texts[texts.length - 1].data.length)
+      const sel = window.getSelection()!
+      sel.removeAllRanges()
+      sel.addRange(range)
+      document.dispatchEvent(new Event('selectionchange'))
+    })
 }
 
 /** 把光标放到元素内第一个文本节点的指定偏移 */
 async function caret(page: Page, selector: string, offset: number): Promise<void> {
-  await page.locator(selector).first().evaluate((el, offset) => {
-    const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT)
-    const text = walker.nextNode() as Text
-    const range = document.createRange()
-    range.setStart(text, Math.min(offset, text.data.length))
-    range.collapse(true)
-    const sel = window.getSelection()!
-    sel.removeAllRanges()
-    sel.addRange(range)
-    document.dispatchEvent(new Event('selectionchange'))
-  }, offset)
+  await page
+    .locator(selector)
+    .first()
+    .evaluate((el, offset) => {
+      const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT)
+      const text = walker.nextNode() as Text
+      const range = document.createRange()
+      range.setStart(text, Math.min(offset, text.data.length))
+      range.collapse(true)
+      const sel = window.getSelection()!
+      sel.removeAllRanges()
+      sel.addRange(range)
+      document.dispatchEvent(new Event('selectionchange'))
+    }, offset)
 }
 
 /** 把光标放到元素内最后一个文本节点的末尾 */
 async function caretEnd(page: Page, selector: string): Promise<void> {
-  await page.locator(selector).first().evaluate((el) => {
-    const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT)
-    let text: Text | null = null
-    let node: Node | null = null
-    while ((node = walker.nextNode())) text = node as Text
-    const range = document.createRange()
-    range.setStart(text!, text!.data.length)
-    range.collapse(true)
-    const sel = window.getSelection()!
-    sel.removeAllRanges()
-    sel.addRange(range)
-    document.dispatchEvent(new Event('selectionchange'))
-  })
+  await page
+    .locator(selector)
+    .first()
+    .evaluate((el) => {
+      const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT)
+      let text: Text | null = null
+      let node: Node | null = null
+      while ((node = walker.nextNode())) text = node as Text
+      const range = document.createRange()
+      range.setStart(text!, text!.data.length)
+      range.collapse(true)
+      const sel = window.getSelection()!
+      sel.removeAllRanges()
+      sel.addRange(range)
+      document.dispatchEvent(new Event('selectionchange'))
+    })
 }
 
 /** 读取页面第一个块的标签名 */
 async function firstBlockTag(page: Page): Promise<string> {
-  return page.locator('.woffice-page').first().evaluate((el) => el.children[0]?.tagName ?? '')
+  return page
+    .locator('.woffice-page')
+    .first()
+    .evaluate((el) => el.children[0]?.tagName ?? '')
 }
 
 const SAMPLE_P = '这是一份在浏览器本地编辑的文档，所有数据都不会离开你的设备。'
@@ -247,23 +259,32 @@ test.describe('列表与分割线', () => {
     await page.locator('.woffice-app-tb-menu-item[data-key="paragraph"]').click()
     // 3 个条目 → 3 个顶层段落，而不是合并成一个
     await expect(page.locator('.woffice-page > ul')).toHaveCount(0)
-    await expect(page.locator('.woffice-page > p').filter({ hasText: '自研文档模型与编辑引擎' })).toHaveCount(1)
-    await expect(page.locator('.woffice-page > p').filter({ hasText: 'docx 导入导出' })).toHaveCount(1)
-    await expect(page.locator('.woffice-page > p').filter({ hasText: '撤销重做、修订模式' })).toHaveCount(1)
+    await expect(
+      page.locator('.woffice-page > p').filter({ hasText: '自研文档模型与编辑引擎' }),
+    ).toHaveCount(1)
+    await expect(
+      page.locator('.woffice-page > p').filter({ hasText: 'docx 导入导出' }),
+    ).toHaveCount(1)
+    await expect(
+      page.locator('.woffice-page > p').filter({ hasText: '撤销重做、修订模式' }),
+    ).toHaveCount(1)
   })
 
   test('列表项渲染出圆点（list-style + display 正确）', async ({ page }) => {
     await page.goto('/?sample')
-    const info = await page.locator('.woffice-page ul').first().evaluate((ul) => {
-      const li = ul.querySelector('li')!
-      const cs = getComputedStyle(li)
-      return {
-        ulListStyle: getComputedStyle(ul).listStyleType,
-        liDisplay: cs.display,
-        liListStyle: cs.listStyleType,
-        liPaddingLeft: getComputedStyle(ul).paddingLeft,
-      }
-    })
+    const info = await page
+      .locator('.woffice-page ul')
+      .first()
+      .evaluate((ul) => {
+        const li = ul.querySelector('li')!
+        const cs = getComputedStyle(li)
+        return {
+          ulListStyle: getComputedStyle(ul).listStyleType,
+          liDisplay: cs.display,
+          liListStyle: cs.listStyleType,
+          liPaddingLeft: getComputedStyle(ul).paddingLeft,
+        }
+      })
     expect(info.ulListStyle).toBe('disc')
     expect(info.liDisplay).toBe('list-item')
     expect(info.liListStyle).toBe('disc')
@@ -295,7 +316,9 @@ test.describe('编辑操作', () => {
     await caret(page, '.woffice-page p', 5)
     await page.keyboard.press('Enter')
     await expect(page.locator('.woffice-page > p').nth(0)).toHaveText('这是一份在')
-    await expect(page.locator('.woffice-page > p').nth(1)).toHaveText('浏览器本地编辑的文档，所有数据都不会离开你的设备。')
+    await expect(page.locator('.woffice-page > p').nth(1)).toHaveText(
+      '浏览器本地编辑的文档，所有数据都不会离开你的设备。',
+    )
   })
 
   test('引用内回车拆分', async ({ page }) => {
@@ -304,7 +327,9 @@ test.describe('编辑操作', () => {
     await page.keyboard.press('Enter')
     await expect(page.locator('.woffice-page blockquote p')).toHaveCount(2)
     await expect(page.locator('.woffice-page blockquote p').nth(0)).toHaveText('点击右上角')
-    await expect(page.locator('.woffice-page blockquote p').nth(1)).toHaveText('「导入 .docx」打开一个 Word 文件试试。')
+    await expect(page.locator('.woffice-page blockquote p').nth(1)).toHaveText(
+      '「导入 .docx」打开一个 Word 文件试试。',
+    )
   })
 
   test('选中加粗后：保留选区 + 按钮高亮', async ({ page }) => {
@@ -319,20 +344,25 @@ test.describe('编辑操作', () => {
 
   test('选中后回车：删除选区内容并拆分', async ({ page }) => {
     await page.goto('/?sample')
-    await page.locator('.woffice-page p').first().evaluate((el) => {
-      const t = el.firstChild as Text
-      const r = document.createRange()
-      r.setStart(t, 5)
-      r.setEnd(t, 10)
-      const s = window.getSelection()!
-      s.removeAllRanges()
-      s.addRange(r)
-      document.dispatchEvent(new Event('selectionchange'))
-    })
+    await page
+      .locator('.woffice-page p')
+      .first()
+      .evaluate((el) => {
+        const t = el.firstChild as Text
+        const r = document.createRange()
+        r.setStart(t, 5)
+        r.setEnd(t, 10)
+        const s = window.getSelection()!
+        s.removeAllRanges()
+        s.addRange(r)
+        document.dispatchEvent(new Event('selectionchange'))
+      })
     await page.keyboard.press('Enter')
     // 选中 [5,10) = “浏览器本地”，删除后拆分为 “这是一份在” + “编辑…”
     await expect(page.locator('.woffice-page > p').nth(0)).toHaveText('这是一份在')
-    await expect(page.locator('.woffice-page > p').nth(1)).toHaveText('编辑的文档，所有数据都不会离开你的设备。')
+    await expect(page.locator('.woffice-page > p').nth(1)).toHaveText(
+      '编辑的文档，所有数据都不会离开你的设备。',
+    )
   })
 
   test('引用内末尾回车：在引用内继续（不脱离引用）', async ({ page }) => {
@@ -402,19 +432,22 @@ test.describe('编辑操作', () => {
     const items = page.locator('.woffice-page li')
     await expect(items).toHaveCount(3)
     // 光标放到最后一个条目末尾
-    await page.locator('.woffice-page li').last().evaluate((el) => {
-      const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT)
-      let text: Text | null = null
-      let node: Node | null = null
-      while ((node = walker.nextNode())) text = node as Text
-      const range = document.createRange()
-      range.setStart(text!, text!.data.length)
-      range.collapse(true)
-      const sel = window.getSelection()!
-      sel.removeAllRanges()
-      sel.addRange(range)
-      document.dispatchEvent(new Event('selectionchange'))
-    })
+    await page
+      .locator('.woffice-page li')
+      .last()
+      .evaluate((el) => {
+        const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT)
+        let text: Text | null = null
+        let node: Node | null = null
+        while ((node = walker.nextNode())) text = node as Text
+        const range = document.createRange()
+        range.setStart(text!, text!.data.length)
+        range.collapse(true)
+        const sel = window.getSelection()!
+        sel.removeAllRanges()
+        sel.addRange(range)
+        document.dispatchEvent(new Event('selectionchange'))
+      })
     await page.keyboard.press('Enter') // 在最后一条后新建空项
     await expect(items).toHaveCount(4)
     await page.keyboard.press('Enter') // 空项再回车 → 退出列表
@@ -452,7 +485,9 @@ test.describe('编辑操作', () => {
     await caret(page, '.woffice-page li p', 0)
     await page.keyboard.press('Backspace')
     await expect(page.locator('.woffice-page > ul > li')).toHaveCount(2)
-    await expect(page.locator('.woffice-page > p').filter({ hasText: '自研文档模型与编辑引擎' })).toHaveCount(1)
+    await expect(
+      page.locator('.woffice-page > p').filter({ hasText: '自研文档模型与编辑引擎' }),
+    ).toHaveCount(1)
   })
 
   test('列表中间条目退格：并入前一条目', async ({ page }) => {
@@ -519,13 +554,11 @@ test.describe('WPS 操作对齐', () => {
     await page.goto('/?sample')
     await caretEnd(page, '.woffice-page h2')
     await page.keyboard.press('Enter')
-    const tags = await page
-      .locator('.woffice-editor-content')
-      .evaluate((el) =>
-        Array.from(el.querySelectorAll('[data-woffice-path]'))
-          .slice(0, 3)
-          .map((e) => e.tagName),
-      )
+    const tags = await page.locator('.woffice-editor-content').evaluate((el) =>
+      Array.from(el.querySelectorAll('[data-woffice-path]'))
+        .slice(0, 3)
+        .map((e) => e.tagName),
+    )
     expect(tags).toEqual(['P', 'H2', 'P'])
   })
 
@@ -739,7 +772,9 @@ test.describe('空白文档', () => {
   test('空段落有占位 <br>（否则高度为 0、光标不可见）', async ({ page }) => {
     await page.goto('/')
     await expect(page.locator('.woffice-page p br')).toHaveCount(1)
-    const height = await page.locator('.woffice-page p').evaluate((el) => el.getBoundingClientRect().height)
+    const height = await page
+      .locator('.woffice-page p')
+      .evaluate((el) => el.getBoundingClientRect().height)
     expect(height).toBeGreaterThan(0)
   })
 
@@ -786,7 +821,9 @@ test.describe('空白文档', () => {
       s.addRange(r)
       content.dispatchEvent(new CompositionEvent('compositionstart', { bubbles: true }))
       p.appendChild(document.createTextNode('撒地方'))
-      content.dispatchEvent(new CompositionEvent('compositionend', { bubbles: true, data: '撒地方' }))
+      content.dispatchEvent(
+        new CompositionEvent('compositionend', { bubbles: true, data: '撒地方' }),
+      )
     })
     await expect(page.locator('.woffice-page p')).toHaveText('撒地方')
     // 组合文本必须已进模型，否则下一次渲染会把它抹掉

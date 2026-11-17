@@ -151,12 +151,19 @@ export class ReplaceTextStep extends BaseStep {
   }
 
   invert(): Step {
-    return new ReplaceTextStep(this.path, this.from, this.from + this.text.length, this.removedText, this.text)
+    return new ReplaceTextStep(
+      this.path,
+      this.from,
+      this.from + this.text.length,
+      this.removedText,
+      this.text,
+    )
   }
 
   mapPosition(pos: Position): Position {
     if (!isSamePath(pos.path, this.path)) return pos
-    if (pos.offset >= this.to) return { ...pos, offset: pos.offset - (this.to - this.from) + this.text.length }
+    if (pos.offset >= this.to)
+      return { ...pos, offset: pos.offset - (this.to - this.from) + this.text.length }
     if (pos.offset <= this.from) return pos
     return { ...pos, offset: this.from + this.text.length }
   }

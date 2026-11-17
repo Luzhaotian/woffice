@@ -58,8 +58,14 @@ describe('serialize', () => {
     expect(() => parse('not json')).toThrow()
     expect(() => parse(JSON.stringify({ type: 'doc' }))).toThrow()
     expect(() => parse(JSON.stringify({ type: 'doc', version: 1, children: 'x' }))).toThrow()
-    expect(() => parse(JSON.stringify({ type: 'doc', version: 1, children: [{ type: 'text' }] }))).toThrow()
-    expect(() => parse(JSON.stringify({ type: 'doc', version: 1, children: [{ type: 'paragraph' }] }))).toThrow()
-    expect(() => parse(JSON.stringify({ type: 'doc', version: 1, children: [{ type: 'hr' }] }))).toThrow()
+    expect(() =>
+      parse(JSON.stringify({ type: 'doc', version: 1, children: [{ type: 'text' }] })),
+    ).toThrow()
+    expect(() =>
+      parse(JSON.stringify({ type: 'doc', version: 1, children: [{ type: 'paragraph' }] })),
+    ).toThrow()
+    expect(() =>
+      parse(JSON.stringify({ type: 'doc', version: 1, children: [{ type: 'hr' }] })),
+    ).toThrow()
   })
 })

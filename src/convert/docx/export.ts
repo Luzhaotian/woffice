@@ -95,7 +95,9 @@ class Serializer {
         const marks = child.marks ?? []
         const link = marks.find((mark) => mark.type === 'link')
         const comment = marks.find((mark) => mark.type === 'comment')
-        const track = marks.find((mark) => mark.type === 'track_insert' || mark.type === 'track_delete')
+        const track = marks.find(
+          (mark) => mark.type === 'track_insert' || mark.type === 'track_delete',
+        )
         const run = `<w:r>${this.rPr(marks)}<w:t xml:space="preserve">${escapeXml(child.text)}</w:t></w:r>`
 
         if (comment) {
@@ -206,7 +208,9 @@ class Serializer {
         // 行尾仍被占用的列
         const maxOccupied = Math.max(
           -1,
-          ...[...occupiedUntil.entries()].filter(([c, until]) => until >= r && c >= col).map(([c]) => c),
+          ...[...occupiedUntil.entries()]
+            .filter(([c, until]) => until >= r && c >= col)
+            .map(([c]) => c),
         )
         for (let c = col; c <= maxOccupied; c++) cellsXml += continuation
 

@@ -1,9 +1,22 @@
 import { describe, expect, it } from 'vitest'
 import type { Document, Node } from '@/model/node'
-import { createDocument, createElement, createText, createVoid, isElement, isText } from '@/model/node'
+import {
+  createDocument,
+  createElement,
+  createText,
+  createVoid,
+  isElement,
+  isText,
+} from '@/model/node'
 import type { Path } from '@/model/path'
 import { getNodeAt, traverse } from '@/model/traverse'
-import { ReplaceChildrenStep, ReplaceTextStep, SetMarksStep, SetNodeAttrsStep, type Step } from '@/engine/step'
+import {
+  ReplaceChildrenStep,
+  ReplaceTextStep,
+  SetMarksStep,
+  SetNodeAttrsStep,
+  type Step,
+} from '@/engine/step'
 
 function mulberry32(seed: number): () => number {
   let a = seed
@@ -36,7 +49,8 @@ function randomStep(rand: () => number, doc: Document): Step {
   const elementEntries: { path: Path; children: Node[] }[] = []
   traverse(doc, (entry) => {
     if (isText(entry.node)) textEntries.push({ path: entry.path, text: entry.node.text })
-    else if (isElement(entry.node)) elementEntries.push({ path: entry.path, children: entry.node.children })
+    else if (isElement(entry.node))
+      elementEntries.push({ path: entry.path, children: entry.node.children })
     return undefined
   })
 
@@ -74,11 +88,17 @@ describe('ReplaceChildrenStep', () => {
   })
 
   it('替换子节点并往返', () => {
-    const doc = createDocument([createElement('paragraph', [createText('a'), createText('b'), createText('c')])])
+    const doc = createDocument([
+      createElement('paragraph', [createText('a'), createText('b'), createText('c')]),
+    ])
     const step = new ReplaceChildrenStep([0], 1, 2, [createText('X')], [createText('b')])
     const after = step.apply(doc)
     const paragraph = after.children[0]
-    expect(isElement(paragraph) && paragraph.children).toEqual([createText('a'), createText('X'), createText('c')])
+    expect(isElement(paragraph) && paragraph.children).toEqual([
+      createText('a'),
+      createText('X'),
+      createText('c'),
+    ])
     expect(step.invert().apply(after)).toEqual(doc)
   })
 
@@ -106,7 +126,9 @@ describe('ReplaceTextStep', () => {
   it('插入文本', () => {
     const doc = createDocument([createElement('paragraph', [createText('ac')])])
     const step = new ReplaceTextStep([0, 0], 1, 1, 'b', '')
-    expect(step.apply(doc)).toEqual(createDocument([createElement('paragraph', [createText('abc')])]))
+    expect(step.apply(doc)).toEqual(
+      createDocument([createElement('paragraph', [createText('abc')])]),
+    )
   })
 
   it('删除文本并往返', () => {

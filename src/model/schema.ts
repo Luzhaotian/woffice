@@ -56,7 +56,12 @@ export function buildSchema(plugins: { nodes?: NodeSpec[]; marks?: MarkSpec[] }[
 export const basicSchema: Schema = createSchema({
   nodes: [
     { type: 'paragraph', role: 'block', tagName: 'p' },
-    { type: 'heading', role: 'block', tagName: 'h1', dynamicTag: (attrs) => `h${(attrs?.level as number) ?? 1}` },
+    {
+      type: 'heading',
+      role: 'block',
+      tagName: 'h1',
+      dynamicTag: (attrs) => `h${(attrs?.level as number) ?? 1}`,
+    },
     { type: 'bullet_list', role: 'block', tagName: 'ul' },
     { type: 'ordered_list', role: 'block', tagName: 'ol' },
     { type: 'list_item', role: 'block', tagName: 'li' },

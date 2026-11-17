@@ -151,7 +151,13 @@ export class ContenteditableBackend {
     if (node && isElement(node)) {
       const domText = this.renderer.getBlockText(pos.path)
       if (!domText) return
-      const step = new ReplaceChildrenStep(pos.path, pos.offset, pos.offset, [createText(domText)], [])
+      const step = new ReplaceChildrenStep(
+        pos.path,
+        pos.offset,
+        pos.offset,
+        [createText(domText)],
+        [],
+      )
       this.applySteps([step], { path: [...pos.path, pos.offset], offset: domText.length }, true)
     }
   }

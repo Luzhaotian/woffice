@@ -82,7 +82,11 @@ describe('normalize', () => {
 
   it('幂等：normalize(normalize(doc)) 返回同一引用', () => {
     const doc = createDocument([
-      createElement('paragraph', [createText('a'), createText(''), createText('b', [{ type: 'bold' }])]),
+      createElement('paragraph', [
+        createText('a'),
+        createText(''),
+        createText('b', [{ type: 'bold' }]),
+      ]),
       createText('c'),
     ])
     const once = normalize(doc)
@@ -103,7 +107,10 @@ describe('normalize', () => {
     const randomNode = (depth: number): Node => {
       const kind = rand()
       if (depth > 2 || kind < 0.4) {
-        return createText(rand() < 0.2 ? '' : `t${Math.floor(rand() * 10)}`, rand() < 0.5 ? [{ type: 'bold' }] : undefined)
+        return createText(
+          rand() < 0.2 ? '' : `t${Math.floor(rand() * 10)}`,
+          rand() < 0.5 ? [{ type: 'bold' }] : undefined,
+        )
       }
       if (kind < 0.5) return createVoid('hr')
       const count = Math.floor(rand() * 4)
