@@ -7,7 +7,7 @@
  *
  * 运行：pnpm e2e
  */
-import { test, expect, Page } from '@playwright/test'
+import { test, expect, type Page } from '@playwright/test'
 
 // ---------------------------------------------------------------------------
 // 辅助
@@ -374,8 +374,9 @@ test.describe('编辑操作', () => {
     // 光标仍在引用块内
     const inQuote = await page.evaluate(() => {
       const sel = window.getSelection()
-      const el = sel?.anchorNode?.nodeType === 1 ? sel.anchorNode : sel?.anchorNode?.parentElement
-      return !!el?.closest?.('blockquote')
+      const node = sel?.anchorNode
+      const el = node instanceof Element ? node : node?.parentElement
+      return !!el?.closest('blockquote')
     })
     expect(inQuote).toBe(true)
   })
@@ -393,8 +394,9 @@ test.describe('编辑操作', () => {
     // 光标已落到引用块外
     const inQuote = await page.evaluate(() => {
       const sel = window.getSelection()
-      const el = sel?.anchorNode?.nodeType === 1 ? sel.anchorNode : sel?.anchorNode?.parentElement
-      return !!el?.closest?.('blockquote')
+      const node = sel?.anchorNode
+      const el = node instanceof Element ? node : node?.parentElement
+      return !!el?.closest('blockquote')
     })
     expect(inQuote).toBe(false)
   })
@@ -810,8 +812,8 @@ test.describe('空白文档', () => {
     await page.goto('/')
     await page.click('.woffice-page p')
     await page.evaluate(() => {
-      const content = document.querySelector('.woffice-editor-content')
-      const p = document.querySelector('.woffice-page p')
+      const content = document.querySelector<HTMLElement>('.woffice-editor-content')!
+      const p = document.querySelector('.woffice-page p')!
       content.focus()
       const r = document.createRange()
       r.setStart(p, 0)

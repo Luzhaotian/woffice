@@ -1,7 +1,7 @@
 // @vitest-environment happy-dom
 import { describe, expect, it } from 'vitest'
 import { readFile } from 'node:fs/promises'
-import { isText } from '@/model/node'
+import { isText, type Node } from '@/model/node'
 import { importDocx } from '@/convert/docx/index'
 
 describe('fixture：rich.docx', () => {
@@ -65,7 +65,7 @@ describe('fixture：rich.docx', () => {
     let checked = 0
     const walk = (node: unknown): void => {
       const n = node as { type: string; children?: unknown[] }
-      if (isText(node)) checked++
+      if (isText(node as Node)) checked++
       for (const child of n.children ?? []) walk(child)
     }
     for (const child of doc.children) walk(child)
