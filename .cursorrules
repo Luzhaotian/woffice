@@ -1,0 +1,107 @@
+# woffice · Cursor 工作规则
+
+> 面向 AI 编码助手。修改代码前先读 `CLAUDE.md` 与 `AGENT.md`。
+> 规则以中文为主；代码标识符、命令、类型名保留英文。
+
+## 项目概览
+
+`woffice` 是纯 TypeScript、框架无关的 Word 风格文档编辑服务库（MIT）：
+
+- 自研编辑内核：不依赖 ProseMirror / Lexical / Slate 等任何三方编辑架构
+- docx 完全自研：OOXML + zip（含 CRC32、deflate/stored），不使用三方 docx / zip 库
+- 核心层无 DOM：`src/model`、`src/engine`、`src/convert` 可独立在 Node 下测试
+- 框架无关：不绑定 Vue / React，不添加框架 peer deps
+
+分层：`model`（纯数据）/ `engine`（纯逻辑）/ `render`（浏览器）/ `input`（浏览器）/
+`convert`（纯函数）/ `app`（UI 外壳）/ `plugins`（Schema + Commands + Keymap）。
+
+## 技术栈与命令
+
+Node 20+、pnpm 10、TypeScript（strict + `verbatimModuleSyntax`）、Vite、
+Vitest（happy-dom）、Playwright、oxlint、Prettier。
+
+```bash
+pnpm install          # 安装依赖
+pnpm dev              # 开发服务器
+pnpm build            # 构建（vite build → tsc → 还原 d.ts 的 @/ 别名）
+pnpm test -- --run    # 单次跑全部单测（pnpm test 是 watch 模式）
+pnpm e2e              # Playwright 端到端（真实浏览器跑 demo）
+pnpm lint             # oxlint
+pnpm format           # Prettier 全量格式化
+pnpm format:check     # 仅校验格式
+```
+
+## 硬性约定（违反会破坏架构）
+
+1. 导入统一用 `@/` 别名（`@` → `src/`），不要写相对路径；改 `src` 结构时同步
+   `vite.config.ts` 的 `resolve.alias` 与 `tsconfig.json` 的 `paths`。
+2. `src/model`、`src/engine`、`src/convert` 禁止 import 浏览器 API
+   （`document` / `window` / `DOMParser` / `Blob` 等）。浏览器逻辑只放
+   `render/`、`input/`、`app/`、`demo/`。
+3. 所有文档修改必须走 Steps（可序列化 + 可逆），不要绕过事务直接改文档树。
+4. 事务提交前必须 `normalize`，保证模型 canonical。
+5. 选区以 DOM 为准并回写模型：`EditorView` 监听 `selectionchange`，
+   用 `Editor.setSelection()` 同步；`editor.getSelection()` 优先读 DOM。
+   命令重渲染后用 `renderer.setSelection(anchor, head)` 恢复选区。
+6. UI 外壳是库的一部分：内置命令的 UI 都在 `src/app/` 的 `WofficeApp`；
+   新增内置命令要同步登记（`MARK_TYPES` / `BLOCK_TOGGLES` / `buildToolbarButton` /
+   `DEFAULT_TOOLBAR`）。demo 只传配置，不要重写 UI。
+7. 新增 Step 必须补 `apply + invert` 往返一致性测试。
+8. DOM 相关测试首行加 `// @vitest-environment happy-dom`；纯逻辑测试不需要。
+9. 注释与测试描述用中文。
+10. 不要提交 `dist/` 或 `node_modules/`。
+
+## 代码风格
+
+- Prettier：无分号、单引号、`printWidth: 100`、2 空格、尾随逗号、LF。
+- 提交前会由 `lint-staged` 自动 `prettier --write` + `oxlint --fix`。
+
+## Git Commit Message 规范（重点）
+
+采用 **Conventional Commits**，描述用**中文**：
+
+```
+<type>(<scope>): <主题>
+
+<正文（可选）>
+```
+
+- `type`（小写）：`feat` 新功能 / `fix` 修复 / `refactor` 重构 /
+  `perf` 性能 / `docs` 文档 / `test` 测试 / `chore` 构建与工具 /
+  `style` 格式 / `ci` 流水线 / `build` 构建产物 / `revert` 回滚
+- `scope`（可选、小写）：`model` / `engine` / `render` / `input` /
+  `plugins` / `app` / `convert` / `docx` / `docs` 等
+- `主题`：中文、陈述句、**不加句号**，一句话说清改了什么
+- `正文`（可选）：说明"为什么这样改 / 影响面"，每行不超过 100 字符
+- 一次提交只做一件事；破坏性变更在正文写 `BREAKING CHANGE: ...`，
+  或在 `type`/`scope` 后加 `!`
+
+示例：
+
+```
+feat(editor): 支持折叠光标处切换格式
+fix(render): 修复相邻代码块合并后的断缝
+refactor(engine): 抽取命令层公共 helper
+perf(render): 减少不必要的全量重建
+test(model): 补充 normalize 幂等用例
+docs: 更新 README 安装说明
+chore: 接入 husky 与 lint-staged
+```
+
+避免：`update` / `fix bug` / `aaa` / 全部大写 / 带句号结尾 /
+把多个不相关改动塞进一次提交。
+
+## 测试约定
+
+- 测试文件镜像 `src/` 结构，放 `test/` 对应目录，命名 `*.test.ts`。
+- 核心不变量：Step `apply + invert` 往返、`normalize` 幂等、选区映射。
+- DOM / 输入闭环参考 `test/render/editor-view.test.ts`。
+- 端到端放 `test/e2e/*.spec.ts`；编辑器选区是**文本节点位置**，
+  构造选区用文本节点而非元素范围。
+
+## 交互与行为基准
+
+- 回答、注释、提交信息以中文为主。
+- 编辑器交互以 **WPS Office 的真实操作习惯**为验收基准，
+  改交互前先想清楚 WPS 会怎么做，不要照搬浏览器 contenteditable 默认行为。
+- 不要引入任何三方编辑架构、三方 docx / zip 库；不要给包加框架 peer deps。
